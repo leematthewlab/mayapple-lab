@@ -351,3 +351,11 @@ str(merged_data_temp_with_treatment_full)
 pairwise_t_test_temp_warm_vs_ambient_full <- pairwise.t.test(merged_data_temp_with_treatment_full$`Temperature (C)`, merged_data_temp_with_treatment_full$Treatment, data = merged_data_temp_with_treatment_full)
 print(pairwise_t_test_temp_warm_vs_ambient_full)
 #p value 0.056, not significant, heartbreaking, holm p value adjustment
+
+#comparing time of ambient vs warm total video length
+str(merged_data_attributes_with_treatment)
+merged_data_attributes_with_treatment$Treatment <- as.factor(merged_data_attributes_with_treatment$Treatment)
+str(merged_data_attributes_with_treatment)
+na.omit(merged_data_attributes_with_treatment)
+str(merged_data_attributes_with_treatment)
+
