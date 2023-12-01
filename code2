@@ -1,0 +1,353 @@
+
+#mayapple project data entry into R and analysis
+#lee matthew (leematthew@vt.edu)
+#10/30/2023
+
+plot(MayappleData_ChamberAttributes)
+na.omit(MayappleData_Temperature)
+
+plot(MayappleData_Temperature$Temperature(C), MayappleData_Temperature$Ibutton_ID)
+plot(MayappleData_Temperature$Ibutton_ID, MayappleData_Temperature$`Temperature (C)')'
+
+
+str(MayappleData_Temperature)
+
+
+
+#11/01/2023
+merged_data_temp_with_treatment <- merge(MayappleData_ChamberTreatments_Ibutton_ID_good, MayappleData_Temperature, by = "Ibutton_ID")
+View(MayappleData_ChamberTreatments_Ibutton_ID)
+#to do: merge treatments onto data sets- start with temp
+#ttest of temperature and treatment; treatment and pollinator visitation
+
+
+merged_data_observations_with_treatment <- merge(MayappleData_ChamberTreatments_Unit_ID, MayappleData_VisitorObservations, by = "Unit ID")
+#note!!! in visitor observations, it is 'Unit ID' instead of 'Ibutton_ID', and so seperate treatment mini data was used, with titles changed so it could be merged
+
+merged_data_attributes_with_treatment <- merge(MayappleData_ChamberTreatments_UnitID_Nospace, MayappleData_ChamberAttributes, by = "UnitID")
+#note!!! same as observations.... but without the space. So made UnitID nospace and merged that instead
+
+
+#somehow i named the merged data sets wrong.... ummm... lemme fix that
+#yay!! ttest time??
+merged_data_temp_with_treatment <- na.omit(merged_data_temp_with_treatment)
+t_test_temp_with_treatment <- t.test(merged_data_temp_with_treatment$Treatment, merged_data_temp_with_treatment$`Temperature (C)`)
+View(merged_data_temp_with_treatment)
+View(MayappleData_Temperature)
+View(MayappleData_ChamberTreatments_Ibutton_ID)
+
+
+ambient_value <- "Ambient"
+
+
+warm_value <- "Warm"
+warm_factor <- as.factor(warm_value)
+
+t_test_temp_with_treatment <- t.test(merged_data_temp_with_treatment$Treatment, merged_data_temp_with_treatment$`Temperature (C)`)
+
+
+# Check if ambient_factor is a factor
+if (is.factor(ambient_factor)) {
+  print("ambient_factor is a factor variable.")
+} else {
+  print("ambient_factor is not a factor variable.")
+}
+
+#uhhhh it says its not a factor
+
+
+summary(merged_data_temp_with_treatment)
+
+
+#threw some themes in
+rstudioapi::addTheme("https://raw.githubusercontent.com/jnolis/synthwave85/master/Synthwave85.rstheme", TRUE, TRUE, FALSE)
+
+oceanic_theme <- "https://raw.githubusercontent.com/gadenbuie/oceanic-eighties/master/oceanic-eighties.rstheme"
+rstudioapi::addTheme("https://raw.githubusercontent.com/gadenbuie/oceanic-eighties/master/oceanic-eighties.rstheme", TRUE, TRUE, FALSE)
+
+
+#ok back to chatgpt trying to get ambient and warm to be conditions
+
+View(MayappleData_ChamberTreatments_Ibutton_ID)
+#it seems ive made it much much worse but im not sure how to reverse it ummmmmm
+#i took back the code i wrote but still the effects are there
+
+
+#but this was basically it >>>
+# Sample data frame
+df <- data.frame(Category = c("A1", "A2", "W1", "W2", "A1"))
+
+# Create factors for "ambient" and "warm"
+df$Category <- factor(df$Category, levels = c("A1", "A2", "W1", "W2"),
+                      labels = c("ambient", "ambient", "warm", "warm"))
+
+#<<<<<
+#ok so i think i broke the dataset ummm
+#im going to throw the mayapple..._Ibutton_ID away and replace it with mayapple..._Ibutton_ID_good
+#ok i deleted the messed up Ibutton_ID and replace with _Ibutton_ID_good
+
+
+
+merged_data_temp_with_treatment <- merge(MayappleData_ChamberTreatments_Ibutton_ID_good, MayappleData_Temperature, by = "Ibutton_ID")
+View(merged_data_temp_with_treatment)
+#wait it worked now !! yippee!
+
+plot(merged_data_temp_with_treatment$Ibutton_ID, merged_data_temp_with_treatment$`Temperature (C)`, na.action = na.pass)
+
+summary(merged_data_temp_with_treatment)
+
+#ok now i am going to try to change the class of 'Treatment' from 'character' to 'factor'
+
+factor(merged_data_temp_with_treatment$Treatment)
+
+#yippee! i think it worked! now i will check
+class(merged_data_temp_with_treatment$Treatment)
+#even though it says 'levels: Ambient Warm' it still says there are "character"!
+#imma check again
+
+# Check if ambient_factor is a factor
+if (is.factor(merged_data_temp_with_treatment$Treatment)) {
+  print("treatment is a factor variable.")
+} else {
+  print("treatment is not a factor variable.")
+}
+#it says it is not a factor this is heartbreaking
+
+summary(merged_data_temp_with_treatment)
+#although it says treatment has two levels - ambient and warm.... so maybe it did work
+
+plot(merged_data_temp_with_treatment$Ibutton_ID, merged_data_temp_with_treatment$`Temperature (C)`)
+summary(merged_data_temp_with_treatment, na.rm = TRUE)
+
+#i try to seperate the ambient and warm once again
+subset_ambient <- subset(merged_data_temp_with_treatment, Treatment == "Ambient")
+subset_warm <- subset(merged_data_temp_with_treatment, Treatment == "Warm")
+#did i do it? i see no error
+
+plot(merged_data_temp_with_treatment$Ibutton_ID, merged_data_temp_with_treatment$`Temperature (C)`)
+summary(merged_data_temp_with_treatment)
+merged_data_temp_with_treatment$...5 <- NULL
+#idk what ...5 is so throw away
+
+barplot(merged_data_temp_with_treatment$Ibutton_ID, merged_data_temp_with_treatment$`Temperature (C)`)
+table(merged_data_temp_with_treatment)
+#this table is very concerning
+
+#11/06/2023
+#had to reupload and remerge data whyyyyy
+#ok saved yippee!
+table(merged_data_temp_with_treatment)
+merged_data_temp_with_treatment <- na.omit(merged_data_temp_with_treatment)
+plot(merged_data_temp_with_treatment$Ibutton_ID, merged_data_temp_with_treatment$`Temperature (C)`, na.exclude())
+
+merged_data_temp_with_treatment <- merged_data_temp_with_treatment[is.finite(merged_data_temp_with_treatment$Treatment) & is.finite(merged_data_temp_with_treatment$`Temperature (C)`), ]
+
+median(merged_data_temp_with_treatment$`Temperature (C)`, na.rm = TRUE)
+#dude how did i delete all of the temperature data 
+
+merged_data_temp_treatment_good <- merge.data.frame(MayappleData_Temperature, MayappleData_ChamberTreatments_Ibutton_ID_good)
+merged_data_temp_with_treatment <- NULL
+merged_data_temp_treatment_good$...5 <- NULL
+
+plot(merged_data_temp_treatment_good$Ibutton_ID, merged_data_temp_treatment_good$`Temperature (C)`, xlim = c(-50, 100))
+plot(na.exclude(merged_data_temp_treatment_good$Ibutton_ID), na.exclude(merged_data_temp_treatment_good$`Temperature (C)`))
+
+temp_na_omitted <- na.omit(merged_data_temp_treatment_good$`Temperature (C)`)
+
+plot(merged_data_temp_treatment_good$Ibutton_ID, x)
+
+summary.data.frame(merged_data_temp_treatment_good)
+t.test(merged_data_temp_treatment_good$Ibutton_ID, x)
+
+ibutton_id_na_omitted <- na.omit(merged_data_temp_treatment_good$Ibutton_ID)
+
+t.test(temp_na_omitted, ibutton_id_na_omitted)
+
+merged_temp_na_omitted <- na.omit(merged_data_temp_treatment_good)
+summary(merged_temp_na_omitted)
+#ok yay! no na in data set anymore hehe
+
+plot(merged_temp_na_omitted)
+temp_split_by_ambient <- split(merged_temp_na_omitted$`Temperature (C)`, "ambient_factor", drop = FALSE)
+summary(temp_split_by_factor)
+levels(temp_split_by_ambient)
+temp_split_by_warm <- split(merged_temp_na_omitted$`Temperature (C)`, "warm_factor", drop = FALSE)
+summary(temp_split_by_warm)
+median(temp_split_by_ambient, na.rm = TRUE)
+sum(temp_split_by_ambient)
+na.omit(temp_split_by_ambient)
+na.omit(temp_split_by_warm)
+median(temp_split_by_ambient)
+
+summary(temp_split_by_ambient)
+
+
+
+
+
+# Create an empty vector to store the medians
+medians_ambient <- numeric(length(temp_split_by_ambient))
+
+# Calculate the median for each group and store it in the 'medians' vector
+for (i in seq_along(temp_split_by_ambient)) {
+  medians_ambient[i] <- median(temp_split_by_ambient[[i]], na.rm = TRUE)
+}
+
+View(medians_ambient
+     )
+
+
+
+
+#chatgpt said so
+# Create an empty vector to store the medians
+medians_warm <- numeric(length(temp_split_by_warm))
+
+# Calculate the median for each group and store it in the 'medians' vector
+for (i in seq_along(temp_split_by_warm)) {
+  medians_warm[i] <- median(temp_split_by_warm[[i]], na.rm = TRUE)
+}
+
+View(medians_warm
+)
+
+
+
+#11/08/2023
+# ok remember to load back the "mayapple_all_datasets" every time opening project i suppose
+
+summary(merged_data_observations_with_treatment)
+merged_data_observations_with_treatment$Pollinator_YorN_binary <- ifelse(merged_data_observations_with_treatment$Pollinator_YorN == "Y", 1, 0)
+merged_data_observations_with_treatment$Antagonist_YorN_binary <- ifelse(merged_data_observations_with_treatment$Antagonist_YorN == "Y", 1, 0)
+merged_data_observations_with_treatment$Treatment_binary <- ifelse(merged_data_observations_with_treatment$Treatment == "Warm", 1, 0)
+
+observations_by_binary_treatment <- tapply(merged_data_observations_with_treatment$`Count of Observations`, merged_data_observations_with_treatment$Treatment_binary, sum, na.rm = TRUE)
+View(observations_by_binary_treatment)
+
+#again with the NAs! only the ambient has NA the warm has a value
+#yay! i fixed it with the na.rm = true! now i have results!
+
+
+#this is how observations of ambient vs warm, 45 vs 19
+
+observant_warm <- merged_data_observations_with_treatment$`Count of Observations`[merged_data_observations_with_treatment$Treatment_binary == 1]
+observant_ambient <- merged_data_observations_with_treatment$`Count of Observations`[merged_data_observations_with_treatment$Treatment_binary == 0]
+View(observant_warm)
+View(observant_ambient)
+
+t_test_observant_warm_vs_ambient <- t.test(observant_warm, observant_ambient)
+print(t_test_observant_warm_vs_ambient)
+#yasss slay 0.007032 p value!!! hooray!!!
+
+#ok time for multiple binary condition time ummmm
+#ok this is kind of a lot ummmmm 
+
+observations_by_all_binary_treatments <- merged_data_observations_with_treatment$`Count of Observations`[(merged_data_observations_with_treatment$Pollinator_YorN_binary == 1) & 
+    (merged_data_observations_with_treatment$Antagonist_YorN_binary == 0) & 
+    (merged_data_observations_with_treatment$Treatment_binary == 0)]
+
+View(observations_by_all_binary_treatments)
+
+
+#huh i wonder if i can do this with ambient and warm instead of and make them kind of factors like that
+
+merged_data_temp_with_treatment$Treatment_binary <- ifelse(merged_data_temp_with_treatment$Treatment == "Warm", 1, 0)
+temp_by_binary_treatment <- tapply(merged_data_temp_with_treatment$`Temperature (C)`, merged_data_temp_with_treatment$Treatment_binary, median, na.rm = TRUE)
+
+View(temp_by_binary_treatment)
+na.omit(merged_data_temp_with_treatment)
+
+"NA" %in% merged_data_temp_with_treatment
+#ok is says NA successful out of temp data ! yippee !
+
+"NA" %in% merged_data_observations_with_treatment
+#yipee! also says no NAs here either
+
+"NA" %in% merged_data_attributes_with_treatment
+#yay!
+
+temp_by_binary_treatment <- tapply(merged_data_temp_with_treatment$`Temperature (C)` , merged_data_temp_with_treatment$Treatment_binary , mean)
+
+#NA still the result of the ambient 
+#NA this NA that omg it ruins everything
+#how can only ambient be NA but warm has a mean????
+
+
+#11/13/2023
+#still on the multiple conditions 
+
+observations_by_all_binary_treatments <- merged_data_observations_with_treatment[
+  (merged_data_observations_with_treatment$Pollinator_YorN_binary == 1) & 
+    (merged_data_observations_with_treatment$Antagonist_YorN_binary == 0) & 
+    (merged_data_observations_with_treatment$Treatment_binary == 0), 
+  "Count of Observations"
+]
+
+summary(na.omit(observations_by_all_binary_treatments))
+
+
+temp_by_binary_treatment <- tapply(merged_data_temp_with_treatment$`Temperature (C)` , merged_data_temp_with_treatment$Treatment_binary )
+summary(temp_by_binary_treatment)
+
+#um
+
+#11/15/2023
+#ok run through multiple conditions another time
+#work on temp or attributes
+
+
+observant_warm <- merged_data_observations_with_treatment$`Count of Observations`[merged_data_observations_with_treatment$Treatment_binary == 1]
+observant_ambient <- merged_data_observations_with_treatment$`Count of Observations`[merged_data_observations_with_treatment$Treatment_binary == 0]
+View(observant_warm)
+View(observant_ambient)
+
+t_test_observant_warm_vs_ambient <- t.test(observant_warm, observant_ambient)
+print(t_test_observant_warm_vs_ambient)
+
+
+
+str(merged_data_temp_with_treatment)
+merged_data_temp_with_treatment$Treatment <- as.factor(merged_data_temp_with_treatment$Treatment)
+
+str(merged_data_temp_with_treatment)
+
+t_test_temp_warm_vs_ambient <- pairwise.t.test(merged_data_temp_with_treatment$Temperature, merged_data_temp_with_treatment$Treatment, data = merged_data_temp_with_treatment)
+
+library(tidyr)
+merged_data_temp_with_treatment$Ibutton_ID <- as.factor(merged_data_temp_with_treatment$Ibutton_ID)
+str(merged_data_temp_with_treatment)
+
+#11/29/2023
+#we trying to get those p values today ! >:)
+
+pairwise_t_test_temp_warm_vs_ambient <- pairwise.t.test(merged_data_temp_with_treatment$`Temperature (C)`, merged_data_temp_with_treatment$Treatment, data = merged_data_temp_with_treatment)
+print(pairwise_t_test_temp_warm_vs_ambient)
+#number give : 0.012 ! yippee?? it says P value adjustment method:holm
+
+#ok i think i got it but i still havent figured out how to put data through
+#multiple conditions to see what affects it
+#how do i adjust for placement and time?
+#this p value also preliminary
+#ok now try to connect github to r studio
+
+system("git config --global user.name 'leematthewlab'")
+library(usethis)
+
+#nevermind oof accidentally added copilot though?
+
+#12/1/2023
+#re-merge temperature_full with treatments, was edited in original data to contain Chamber_ID as well as Ibutton_ID
+#also when went back saw that first data set and missing data because of transfer so added that also
+
+str(MayappleData_Temperature_Full)
+na.omit(MayappleData_Temperature_Full)
+merged_data_temp_with_treatment_full <- merge(MayappleData_ChamberTreatments_Ibutton_ID_good, MayappleData_Temperature_Full, by = "Ibutton_ID")
+str(merged_data_temp_with_treatment_full)
+View(merged_data_temp_with_treatment_full)
+merged_data_temp_with_treatment_full$Treatment <- as.factor(merged_data_temp_with_treatment_full$Treatment)
+str(merged_data_temp_with_treatment_full)
+#yippee! new full temperature set merged with treatment and made ambient/warm into factors. 
+#redo t.test
+pairwise_t_test_temp_warm_vs_ambient_full <- pairwise.t.test(merged_data_temp_with_treatment_full$`Temperature (C)`, merged_data_temp_with_treatment_full$Treatment, data = merged_data_temp_with_treatment_full)
+print(pairwise_t_test_temp_warm_vs_ambient_full)
+#p value 0.056, not significant, heartbreaking, holm p value adjustment
