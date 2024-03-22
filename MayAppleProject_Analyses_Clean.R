@@ -26,16 +26,19 @@ library(ggplot2)
 ##############################################################################
 ##############################################################################
 
-
-
-
-#11/29/2023
-#we trying to get those p values today ! >:)
-pairwise_t_test_temp_warm_vs_ambient <- pairwise.t.test(merged_data_temp_with_treatment$`Temperature (C)`, merged_data_temp_with_treatment$Treatment, data = merged_data_temp_with_treatment)
-print(pairwise_t_test_temp_warm_vs_ambient)
+#10/30/2023 - uploaded main datasets
+#11/01/2023 - began merging ibutton IDs/unit IDs to datasets, tried factors unsuccessfully
+#11/06/2023 - reupload and remerge data, did some na.omit, some unsuccessful t-tests
+#11/08/2023 - observations before the last set was added, did t test
+#observations of ambient vs warm, 45 vs 19, 0.007032 p value, this is not the final p value
+#but thought i would keep it in though, also did some na.rm = true, did some binary work
+#11/13/2023 - made observation treatments through making binary, redid more effectively later
+#11/15/2023 - some observation and temperature tests i redid later, merging with treatments
+#11/29/2023 - temp t-test p value for incomplete dataset
+#pairwise_t_test_temp_warm_vs_ambient <- pairwise.t.test(merged_data_temp_with_treatment$`Temperature (C)`, merged_data_temp_with_treatment$Treatment, data = merged_data_temp_with_treatment)
+#print(pairwise_t_test_temp_warm_vs_ambient)
 #number give : 0.012 ! yippee?? it says P value adjustment method:holm
 #this was for the temperature dataset that was missing data
-#thought i would keep it in though
 
 #12/1/2023 - temperature with treatments
 #re-merge temperature_full with treatments, was edited in original data to contain Chamber_ID as well as Ibutton_ID
@@ -53,7 +56,6 @@ str(merged_data_temp_with_treatment_full)
 pairwise_t_test_temp_warm_vs_ambient_full <- pairwise.t.test(merged_data_temp_with_treatment_full$`Temperature (C)`, merged_data_temp_with_treatment_full$Treatment, data = merged_data_temp_with_treatment_full)
 print(pairwise_t_test_temp_warm_vs_ambient_full)
 #p value 0.056, not significant, heartbreaking, holm p value adjustment
-
 
 #comparing time of ambient vs warm total video length
 str(merged_data_attributes_with_treatment)
