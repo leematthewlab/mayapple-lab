@@ -21,6 +21,7 @@ library(ggplot2)
 
 #note: code was put here most recent to least recent 
 #-> this is because the two biggest dataset had to be redone becuase of missing data so most relevant code is most recent
+#not complete, im missing times on observations dataset
 ##############################################################################
 ##############################################################################
 ##############################################################################
@@ -118,6 +119,61 @@ print(plot2)
 
 #2/16/24 - tests gave weird results, no use
 #2/23/2024 - graphs no longer useful
+na.omit(merged_observations_to_time_by_factors_hms)
+plot3 <- ggplot(merged_observations_to_time_by_factors_hms, aes(x = factor(UnitID), fill = factor(sum_of_observations_by_factor), color = Treatment)) +
+  geom_bar() +
+  labs(title = "Pollinator observations for different treatments",
+       x = "Treatment",
+       y = "pollinator count") 
+
+
+print(plot3)
+str(merged_observations_to_time_by_factors_hms)
+View(merged_observations_to_time_by_factors_hms)
+
+plot4 <- ggplot(merged_observations_to_time_by_factors_hms, aes(x = UnitID, y = sum_count)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Bar Graph of sum_count by UnitID",
+       x = "UnitID",
+       y = "sum_count") +
+  scale_fill_manual(values = c("#3498db", "#e74c3c", "#2ecc71", "#f39c12", "#1abc9c", "#9b59b6", "#34495e", "#e67e22", "#95a5a6", "#d35400", "#27ae60", "#c0392b")) +
+  theme_minimal()
+
+plot4 <- ggplot(merged_observations_to_time_by_factors_hms, aes(x = Treatment, y = sum_count, fill = Treatment)) +
+  geom_boxplot() +
+  labs(title = "Pollinator Count of Ambient and Warm",
+       x = "Treatment",
+       y = "Sum of Pollinator Count") +
+  scale_fill_manual(values = c("#4CAF50", "#008000"))
+
+print(plot4)
+
+#the merging of the factors was incorrect and cut out 4 sets of data so we restart
+str(MayappleData_VisitorObservations)
+
+as.factor(MayappleData_VisitorObservations$`Unit ID`)
+str(MayappleData_VisitorObservations)
+
+
+summary(merged_data_observations_with_treatment)
+MayappleData_VisitorObservations$Pollinator_YorN_binary <- ifelse(MayappleData_VisitorObservations$Pollinator_YorN == "Y", 1, 0)
+MayappleData_VisitorObservations$Antagonist_YorN_binary <- ifelse(MayappleData_VisitorObservations$Antagonist_YorN == "Y", 1, 0)
+
+observations_by_binary_treatment <- tapply(MayappleData_VisitorObservations$`Count of Observations`, MayappleData_VisitorObservations$Treatment_binary, sum, na.rm = TRUE)
+str(MayappleData_VisitorObservations)
+library(tidyr)
+library(dplyr)
+sum_of_observations_by_factor_2 <- MayappleData_VisitorObservations %>%
+  filter(!is.na(`Count of Observations`)) %>%
+  group_by(`Unit ID`) %>%
+  summarise(sum_count = sum(`Count of Observations`, na.rm = TRUE))
+print(sum_of_observations_by_factor_2)
+MayappleData_VisitorObservations$`Unit ID` <- as.factor(MayappleData_VisitorObservations$`Unit ID`)
+str(merged_data_observations_with_treatment)
+
+#below is copied from above
+#i need to merge the chamber attributes, which contain the time, to the observations
+
 #2/26/2024 cont
 
 MayappleData_VisitorObservations <- MayappleData_VisitorObservations %>%
