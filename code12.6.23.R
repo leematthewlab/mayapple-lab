@@ -495,7 +495,7 @@ merged_observations_to_time_by_factor = merged_observations_to_time_by_factor %>
 #there was only one note, that was that videos of 2 seconds or less were not counted
 
 
-#time to compare ambient and warm 'count_divided_by_time's
+#time to compare ambient and warm _divided_by_time's
 
 ambient_count_divided_by_time = merged_observations_to_time_by_factor$count_divided_by_time[merged_observations_to_time_by_factor$Treatment == "Ambient"]
 warm_count_divided_by_time = merged_observations_to_time_by_factor$count_divided_by_time[merged_observations_to_time_by_factor$Treatment == "Warm"]
@@ -774,7 +774,6 @@ t_test_results_2 <- average_temp_daily %>%
   summarise(p_value = t.test(Avg_Temperature ~ Treatment, data = .)$p.value)
 
 print(t_test_results_2)
-View
 
 
 #2/23/2024
@@ -916,6 +915,47 @@ sum_observations_1 <- aggregate(MayappleData_VisitorObservations_with_time_treat
 
 View(sum_observations_1)
 
+#03/25/2024
+
+sum_observations_1 <- sum_observations_1 %>%
+  rename('UnitID' = 'MayappleData_VisitorObservations_with_time_treatment_5$UnitID')
+
+treatments_3_25_2024_Sheet1 <- treatments_3_25_2024_Sheet1 %>%
+  rename('UnitID' = 'MayappleData_VisitorObservations_with_time_treatment_5$UnitID')
+
+sum_observations_2 = merge(sum_observations_1, treatments_3_25_2024_Sheet1, by = "UnitID")
+View(sum_observations_2)
+
+sum_observations_2 <- sum_observations_2 %>%
+  rename('Count' = 'MayappleData_VisitorObservations_with_time_treatment_5$\`Count of Observations\`')
+
+plot30 <- ggplot(sum_observations_2, aes(x = Treatment, y = Count, fill = Treatment)) +
+  geom_boxplot() +
+  geom_point(position = position_jitterdodge(), size = 2) + # Add points with jitter to spread out points horizontally
+  labs(title = "Sum of Pollinator Count in Ambient and Warm Treatments",
+       x = "Treatment",
+       y = "Sum of Pollinator Count") +
+  scale_fill_manual(values = c("#4CAF50", "#008000"))
+
+print(plot30)
+
+sum_observations_2_ttest = t.test(sum_observations_2$Count ~ sum_observations_2$Treatment, paired = FALSE)
+print(sum_observations_2_ttest)
+#unpaired: t = 2.1871, df = 11.746, p-value = 0.04973
+#unpaired:mean in group Ambient=10.222222    mean in group Warm=2.857143 
+
+sum(is.na(sum_observations_2$Count))
+sum(is.na(sum_observations_2$Treatment))
+
+length(sum_observations_2$Count)
+length(sum_observations_2$Treatment)
+
+levels(sum_observations_2$Treatment)
+
+sum_observations_2 = sum_observations_2 %>%
+  select(-Notes.y)
+
+
 #to merge, we make 6
 #3/1/2024
 
@@ -952,6 +992,8 @@ plot6 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = 
   scale_fill_manual(values = c("#4CAF50", "#008000"))
 
 print(plot6)
+
+View(MayappleData_VisitorObservations_with_time_treatment_6)
 
 plot7 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = Treatment, y = `MayappleData_VisitorObservations_with_time_treatment_5$\`Count of Observations\``, fill = Treatment)) +
   geom_boxplot() +
@@ -1011,3 +1053,80 @@ plot22 <- ggplot(seed_data, aes(x = Treatment)) +
        y = "Count")
 
 print(plot22)
+
+#04/01/2024
+View(merged_data_temp_with_treatment_full)
+str(merged_data_temp_with_treatment_full)
+#in this date is a character
+#time is in 'hms' num which im not sure,
+#chamber_ID is also a number
+#ibutton_ID is a character
+#only treatment is a factor, so make chamber and ibutton into factor, make date into date
+
+merged_data_temp_with_treatment_full$Ibutton_ID = as.factor(merged_data_temp_with_treatment_full$Ibutton_ID)
+merged_data_temp_with_treatment_full$Chamber_ID = as.factor(merged_data_temp_with_treatment_full$Chamber_ID)
+
+# Convert the Date column to a Date object
+merged_data_temp_with_treatment_full$Date <- as.Date(merged_data_temp_with_treatment_full$Date, format = "%m/%d/%y")
+str(merged_data_temp_with_treatment_full)
+
+merged_data_temp_with_treatment_full <- merged_data_temp_with_treatment_full %>%
+  rename(Temperature = 'Temperature (C)')
+
+plot8 <- ggplot(merged_data_temp_with_treatment_full, aes(x = Date, y = Temperature, color = factor(Chamber_ID))) +
+  geom_line() +
+  geom_point() +
+  labs(title = " Ambient and Warm Temperatures",
+       x = "Date",
+       y = "Temperature, not averaged",
+       color = "Chamber") +
+  theme_minimal()
+
+print(plot8)
+
+str(merged_data_temp_with_treatment_full)
+#chat time
+library(dplyr)
+library(lubridate)
+
+# Assuming your dataset is named 'my_data'
+# and your columns are named 'factor1', 'factor2', 'date_column', and 'data_points'
+
+# Convert the date column to a Date objectxx
+merged_data_temp_with_treatment_full$Date <- mdy(merged_data_temp_with_treatment_full$Date)
+
+# Group by factors and date, then calculate the average of data points
+result_8 <- merged_data_temp_with_treatment_full %>%
+  group_by(Treatment, Chamber_ID, Date) %>%
+  summarize(average_temp_8 = mean(Temperature))
+
+# If you want to arrange the result by date, you can add the following line:
+result_8 <- result_8 %>% arrange(Date)
+
+# Print the result
+print(result_8)
+View(result_8)
+#result_8 is successful, will use for figures now in plot 
+
+plot8 <- ggplot(result_8, aes(x = Date, y = average_temp_8, color = factor(Chamber_ID))) +
+  geom_line() +
+  geom_text(aes(label = sprintf("%.1f", average_temp_8)), 
+            hjust = 0, vjust = 1, position = position_dodge(0.5), size = 2) + 
+  labs(title = " Ambient and Warm Temperatures",
+       x = "Date",
+       y = "Temperature, not averaged",
+       color = "Chamber") +
+  theme_minimal()
+
+print(plot8)
+
+plot9 <- ggplot(result_8, aes(x = Date, y = average_temp_8, color = factor(Treatment))) +
+  geom_line() +
+  geom_point() +
+  labs(title = " Ambient and Warm Temperatures",
+       x = "Date",
+       y = "Temperature, the average for each date",
+       color = "Chamber") +
+  theme_minimal()
+
+print(plot9)
