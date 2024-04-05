@@ -989,7 +989,7 @@ plot6 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = 
   labs(title = "Rate of Pollinator Count in Ambient and Warm Treatments",
        x = "Treatment",
        y = "Rate of Pollinator Count") +
-  scale_fill_manual(values = c("#4CAF50", "#008000"))
+  scale_fill_manual(values = c("#4CAF50", "#000080"))
 
 print(plot6)
 
@@ -1001,7 +1001,7 @@ plot7 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = 
   labs(title = "Sum of Pollinator Count in Ambient and Warm",
        x = "Treatment",
        y = "Sum of Pollinator Count") +
-  scale_fill_manual(values = c("#4CAF50", "#008000"))
+  scale_fill_manual(values = c("#4CAF50", "#000080"))
 
 print(plot7)
 
@@ -1032,7 +1032,7 @@ plot20 <- ggplot(seed_data, aes(x = Treatment, y = Count, fill = Treatment)) +
   labs(title = "Seed Count",
        x = "Treatment",
        y = "Count") +
-  scale_fill_manual(values = c("#4CAF50", "#008000", "#FF5733"))
+  scale_fill_manual(values = c("#4CAF50", "#000080", "#FF5733"))
 
 print(plot20)
 
@@ -1041,12 +1041,12 @@ plot21 <- ggplot(seed_data, aes(x = Treatment, y = Count)) +
   labs(title = "Seed Count",
        x = "Treatment",
        y = "Count") +
-  scale_fill_manual(values = c("#4CAF50", "#008000", "#FF5733"))
+  scale_fill_manual(values = c("#4CAF50", "#000080", "#FF5733"))
 
 print(plot21)
 
 plot22 <- ggplot(seed_data, aes(x = Treatment)) +
-  geom_bar(position = "dodge", fill = c("#4CAF50", "#008000", "#FF5733")) +
+  geom_bar(position = "dodge", fill = c("#4CAF50", "#000080", "#FF5733")) +
   geom_point(position = position_jitterdodge(), size = 2, color = "black") +
   labs(title = "Seed Count",
        x = "Treatment",
@@ -1155,8 +1155,6 @@ print(plot_all)
 plot_all_1 <- ggplot(result_8, aes(x = Date, y = average_temp_8, color = factor(Chamber_ID), linetype = Treatment)) +
   geom_line(size = 0.5) +
   geom_point() +
-  geom_text_repel(aes(label = round(average_temp_8, 1)), 
-                  size = 3, color = "black", show.legend = FALSE) +
   labs(title = "Temperature over Time",
        x = "Date (yyyy-mm-dd)",
        y = "Temperature (C)",
@@ -1169,3 +1167,96 @@ plot_all_1 <- ggplot(result_8, aes(x = Date, y = average_temp_8, color = factor(
 print(plot_all_1)
 
 str(result_8)
+
+library(ggplot2)
+
+# Assuming your dataset is named 'result_8' and contains columns 'Treatment' and 'average_temp_8'
+library(ggplot2)
+
+# Assuming your dataset is named 'result_8' and contains columns 'Treatment' and 'average_temp_8'
+
+boxplot_2 <- ggplot(result_8, aes(x = Treatment, y = average_temp_8)) +
+  geom_boxplot() +
+  stat_summary(fun = mean, geom = "point", shape = 3, size = 3, color = "red", show.legend = FALSE) + # Add mean point
+  stat_summary(fun = max, geom = "point", shape = 17, size = 3, color = "blue", show.legend = FALSE) + # Add max point
+  stat_summary(fun = min, geom = "point", shape = 15, size = 3, color = "green", show.legend = FALSE) + # Add min point
+  labs(title = "Boxplot of Temperature by Treatment",
+       x = "Treatment",
+       y = "Average Temperature") +
+  theme_minimal()
+
+print(boxplot_2)
+
+library(ggplot2)
+
+# Assuming your dataset is named 'result_8' and contains columns 'Treatment' and 'average_temp_8'
+
+boxplot_3 <- ggplot(result_8, aes(x = Treatment, y = average_temp_8)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", color = "red", show.legend = FALSE) + # Add mean point
+  stat_summary(fun.y = max, geom = "point", color = "blue", show.legend = FALSE) + # Add max point
+  stat_summary(fun.y = min, geom = "point", color = "green", show.legend = FALSE) + # Add min point
+  stat_summary(fun.y = mean, geom = "text", aes(label = round(..y.., 2)), vjust = -0.5, color = "red", size = 3, show.legend = FALSE) + # Add mean label
+  stat_summary(fun.y = max, geom = "text", aes(label = round(..y.., 2)), vjust = -1, color = "blue", size = 3, show.legend = FALSE) + # Add max label
+  stat_summary(fun.y = min, geom = "text", aes(label = round(..y.., 2)), vjust = 1.5, color = "green", size = 3, show.legend = FALSE) + # Add min label
+  labs(title = "Boxplot of Temperature by Treatment",
+       x = "Treatment",
+       y = "Average Temperature") +
+  theme_minimal()
+
+print(boxplot_3)
+
+
+
+
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
+# Assuming your dataset is named 'result_8' and contains columns 'Treatment', 'average_temp_8', and 'Date'
+
+# Convert 'Date' column to date format
+result_8$Date <- as.Date(result_8$Date)
+
+# Filter the dataset to include only the observations from the first month
+result_8_first_month <- result_8 %>%
+  filter(month(Date) == 4)  # Assuming April is the first month
+
+# Create the boxplot using the filtered dataset
+boxplot_first_month <- ggplot(result_8_first_month, aes(x = Treatment, y = average_temp_8)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", color = "red", show.legend = FALSE) + # Add mean point
+  stat_summary(fun.y = max, geom = "point", color = "blue", show.legend = FALSE) + # Add max point
+  stat_summary(fun.y = min, geom = "point", color = "green", show.legend = FALSE) + # Add min point
+  stat_summary(fun.y = mean, geom = "text", aes(label = round(..y.., 2)), vjust = -0.5, color = "red", size = 3, show.legend = FALSE) + # Add mean label
+  stat_summary(fun.y = max, geom = "text", aes(label = round(..y.., 2)), vjust = -1, color = "blue", size = 3, show.legend = FALSE) + # Add max label
+  stat_summary(fun.y = min, geom = "text", aes(label = round(..y.., 2)), vjust = 0.5, color = "green", size = 3, show.legend = FALSE) + # Add min label
+  labs(title = "Boxplot of Temperature by Treatment (First Month)",
+       x = "Treatment",
+       y = "Average Temperature") +
+  theme_minimal()
+
+print(boxplot_first_month)
+
+result_8_second_month <- result_8 %>%
+  filter(month(Date) == 5) 
+
+boxplot_second_month <- ggplot(result_8_first_month, aes(x = Treatment, y = average_temp_8)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", color = "red", show.legend = FALSE) + # Add mean point
+  stat_summary(fun.y = max, geom = "point", color = "blue", show.legend = FALSE) + # Add max point
+  stat_summary(fun.y = min, geom = "point", color = "green", show.legend = FALSE) + # Add min point
+  stat_summary(fun.y = mean, geom = "text", aes(label = round(..y.., 2)), vjust = -0.5, color = "red", size = 3, show.legend = FALSE) + # Add mean label
+  stat_summary(fun.y = max, geom = "text", aes(label = round(..y.., 2)), vjust = -1, color = "blue", size = 3, show.legend = FALSE) + # Add max label
+  stat_summary(fun.y = min, geom = "text", aes(label = round(..y.., 2)), vjust = 0.5, color = "green", size = 3, show.legend = FALSE) + # Add min label
+  labs(title = "Boxplot of Temperature by Treatment (First Month)",
+       x = "Treatment",
+       y = "Average Temperature") +
+  theme_minimal()
+
+print(boxplot_second_month)
+
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
