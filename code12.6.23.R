@@ -1130,3 +1130,42 @@ plot9 <- ggplot(result_8, aes(x = Date, y = average_temp_8, color = factor(Treat
   theme_minimal()
 
 print(plot9)
+
+library(ggplot2)
+install.packages("ggrepel")
+
+library(ggrepel)
+
+# Assuming your dataset is named 'result_8' and contains columns 'Date', 'average_temp_8', 'Treatment', and 'Chamber_ID'
+
+plot_all <- ggplot(result_8, aes(x = Date, y = average_temp_8, color = Treatment, linetype = factor(Chamber_ID))) +
+  geom_line() +
+  geom_point() +
+  geom_text_repel(aes(label = round(average_temp_8, 1)), 
+                  size = 3, color = "black", show.legend = FALSE) + 
+  labs(title = "Temperature over Time",
+       x = "Date",
+       y = "Temperature",
+       color = "Treatment",
+       linetype = "Chamber") +
+  theme_minimal()
+
+print(plot_all)
+
+plot_all_1 <- ggplot(result_8, aes(x = Date, y = average_temp_8, color = factor(Chamber_ID), linetype = Treatment)) +
+  geom_line(size = 0.5) +
+  geom_point() +
+  geom_text_repel(aes(label = round(average_temp_8, 1)), 
+                  size = 3, color = "black", show.legend = FALSE) +
+  labs(title = "Temperature over Time",
+       x = "Date (yyyy-mm-dd)",
+       y = "Temperature (C)",
+       color = "Chamber",
+       linetype = "Treatment") +
+  scale_color_manual(values = c("red", "blue", "green", "orange", "purple", "pink", "brown", "cyan", "gray", "magenta")) +
+  scale_x_date(date_breaks = "1 week", date_labels = "%Y-%m-%d") + # Adjust x-axis date format
+  theme_minimal()
+
+print(plot_all_1)
+
+str(result_8)
