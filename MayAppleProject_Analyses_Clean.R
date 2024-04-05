@@ -120,17 +120,6 @@ print(plot2)
 #2/16/24 - tests gave weird results, no use
 #2/23/2024 - graphs no longer useful
 na.omit(merged_observations_to_time_by_factors_hms)
-plot3 <- ggplot(merged_observations_to_time_by_factors_hms, aes(x = factor(UnitID), fill = factor(sum_of_observations_by_factor), color = Treatment)) +
-  geom_bar() +
-  labs(title = "Pollinator observations for different treatments",
-       x = "Treatment",
-       y = "pollinator count") 
-
-
-print(plot3)
-str(merged_observations_to_time_by_factors_hms)
-View(merged_observations_to_time_by_factors_hms)
-
 plot4 <- ggplot(merged_observations_to_time_by_factors_hms, aes(x = UnitID, y = sum_count)) +
   geom_bar(stat = "identity") +
   labs(title = "Bar Graph of sum_count by UnitID",
@@ -275,6 +264,7 @@ plot7 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = 
   scale_fill_manual(values = c("#4CAF50", "#008000"))
 print(plot7)
 
+#plot7 works now, plot6 does NOT. plot6 was supposed to be rate of pollinator count
 #seed count data, manually entered, as cannot test because no warm treatment seeds
 controlseed <- c(46, 32)
 ambientseed <- c(49, 47, 12)
@@ -297,4 +287,5 @@ plot20 <- ggplot(seed_data, aes(x = Treatment, y = Count, fill = Treatment)) +
   scale_fill_manual(values = c("#4CAF50", "#008000", "#FF5733"))
 
 print(plot20)
+#plot20 works
 #fin: 03/17/2024
