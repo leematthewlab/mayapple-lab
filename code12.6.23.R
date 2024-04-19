@@ -343,6 +343,8 @@ na.omit(MayappleData_Temperature_Full)
 merged_data_temp_with_treatment_full <- merge(MayappleData_ChamberTreatments_Ibutton_ID_good, MayappleData_Temperature_Full, by = "Ibutton_ID")
 str(merged_data_temp_with_treatment_full)
 View(merged_data_temp_with_treatment_full)
+
+
 merged_data_temp_with_treatment_full$Treatment <- as.factor(merged_data_temp_with_treatment_full$Treatment)
 str(merged_data_temp_with_treatment_full)
 #yippee! new full temperature set merged with treatment and made ambient/warm into factors. 
@@ -1070,8 +1072,8 @@ merged_data_temp_with_treatment_full$Chamber_ID = as.factor(merged_data_temp_wit
 merged_data_temp_with_treatment_full$Date <- as.Date(merged_data_temp_with_treatment_full$Date, format = "%m/%d/%y")
 str(merged_data_temp_with_treatment_full)
 
-merged_data_temp_with_treatment_full <- merged_data_temp_with_treatment_full %>%
-  rename(Temperature = 'Temperature (C)')
+merged_data_temp_with_treatment_full_1 <- merged_data_temp_with_treatment_full %>%
+  rename(Temperature = 'Temperature')
 
 plot8 <- ggplot(merged_data_temp_with_treatment_full, aes(x = Date, y = Temperature, color = factor(Chamber_ID))) +
   geom_line() +
@@ -1084,7 +1086,7 @@ plot8 <- ggplot(merged_data_temp_with_treatment_full, aes(x = Date, y = Temperat
 
 print(plot8)
 
-str(merged_data_temp_with_treatment_full)
+str(merged_data_temp_with_treatment_full_1)
 #chat time
 library(dplyr)
 library(lubridate)
@@ -1260,3 +1262,52 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 
+#04/08/2024
+#redoing temperature t-tests, pollination-temperature regression
+
+lastpairedtemp <- t.test(merged_data_temp_with_treatment_full$`Temperature (C)` ~ merged_data_temp_with_treatment_full$Treatment, paired = TRUE)
+print(lastpairedtemp)
+#unpaired = pvalue 0.05616
+
+View(result_8_first_month)
+pairedtempfirstmonth <- t.test(result_8_first_month$average_temp_8 ~ result_8_first_month$Treatment, paired = TRUE)
+print(pairedtempfirstmonth)
+#p value in the first month, paired = 0.3434, df = 123, t = -0.95113, with a mean difference of -0.1430238
+
+View(result_8)
+lastpaired_1 <- t.test(result_8$average_temp_8 ~ result_8$Treatment, paired = TRUE)
+print(lastpaired_1)
+#averages for each day in a t.test, unpaired, p value = 0.54, df = 537.93, t = -0.61324
+#mean in group Ambient = 13.28028 unpaired
+#mean in group Warm = 13.42158 unpaired
+
+
+#04/12/2024
+#loaded a dataset from december accidently hope this doesn't mess any of my code up
+#ok so somehow deleted all the date information
+View(result_8)
+str(MayappleData_Fixed_Temp_3_xlsb)
+MayappleData_Fixed_Temp_3_xlsb$Chamber_ID = as.factor(MayappleData_Fixed_Temp_3_xlsb$Chamber_ID)
+MayappleData_Fixed_Temp_3_xlsb$Ibutton_ID = as.factor(MayappleData_Fixed_Temp_3_xlsb$Ibutton_ID)
+str(MayappleData_Fixed_Temp_3_xlsb)
+#now i load treatment dataset
+View(treatments_3_25_2024_Sheet1)
+str(MayappleData_ChamberTreatments_Ibutton_ID_good)
+MayappleData_ChamberTreatments_Ibutton_ID_good$Ibutton_ID = as.factor(MayappleData_ChamberTreatments_Ibutton_ID_good$Ibutton_ID)
+MayappleData_ChamberTreatments_Ibutton_ID_good$Treatment = as.factor(MayappleData_ChamberTreatments_Ibutton_ID_good$Treatment)
+MayappleData_Fixed_Temp_3_xlsb = MayappleData_Fixed_Temp_3_xlsb %>%
+  rename('ChamberID' = 'Chamber_ID')
+MayappleData_Fixed_Temp_3_xlsb = MayappleData_Fixed_Temp_3_xlsb %>%
+  rename('Temperature' = 'Temperature (C)')
+newtemp4 = merge(MayappleData_Fixed_Temp_3_xlsb, MayappleData_ChamberTreatments_Ibutton_ID_good, by = 'Ibutton_ID')
+str(newtemp4)
+View(newtemp4)
+# Calculate average temperature for each level of ChamberID
+average_temp_newtemp4 <- aggregate(Temperature ~ ChamberID, data = newtemp4, FUN = mean)
+print(average_temp_newtemp4)
+newtemp4_withavtemp <- merge(newtemp4, average_temp_newtemp4, by = "ChamberID")
+View(newtemp4_withavtemp)  
+#tempy is the average for each chamber over course of study  
+  
+  
+  

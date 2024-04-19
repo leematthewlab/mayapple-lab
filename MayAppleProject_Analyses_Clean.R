@@ -86,7 +86,7 @@ merged_mayappledata_fixed_temp_2_averaged <- merged_mayappledata_fixed_temp_2_fi
   summarise(Avg_Temperature = mean(`Temperature (C)`))
 
 #line graph temperature of treatments
-plot <- ggplot(merged_mayappledata_fixed_temp_2_averaged, aes(x = Date, y = Avg_Temperature, color = Treatment)) +
+plot <- ggplot(merged_mayappledata_fixed_temp_2_averaged, aes(x = Date, y = Avg_Temperature, color = factor(Treatment)) +
   geom_line(size = 1) +
   geom_text(aes(label = sprintf("%.1f", Avg_Temperature)), 
             hjust = 0, vjust = 1, position = position_dodge(0.5), size = 2) + 
@@ -99,6 +99,7 @@ plot <- ggplot(merged_mayappledata_fixed_temp_2_averaged, aes(x = Date, y = Avg_
   theme_light() +
   theme(plot.background = element_rect(fill = "#F5F5DC"))
 print(plot)
+
 
 average_temp_weekly <- merged_mayappledata_fixed_temp_2_filter %>%
   group_by(Treatment, week = lubridate::week(Date)) %>%
@@ -120,14 +121,6 @@ print(plot2)
 #2/16/24 - tests gave weird results, no use
 #2/23/2024 - graphs no longer useful
 na.omit(merged_observations_to_time_by_factors_hms)
-plot4 <- ggplot(merged_observations_to_time_by_factors_hms, aes(x = UnitID, y = sum_count)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Bar Graph of sum_count by UnitID",
-       x = "UnitID",
-       y = "sum_count") +
-  scale_fill_manual(values = c("#3498db", "#e74c3c", "#2ecc71", "#f39c12", "#1abc9c", "#9b59b6", "#34495e", "#e67e22", "#95a5a6", "#d35400", "#27ae60", "#c0392b")) +
-  theme_minimal()
-
 plot4 <- ggplot(merged_observations_to_time_by_factors_hms, aes(x = Treatment, y = sum_count, fill = Treatment)) +
   geom_boxplot() +
   labs(title = "Pollinator Count of Ambient and Warm",
@@ -140,7 +133,7 @@ print(plot4)
 #the merging of the factors was incorrect and cut out 4 sets of data so we restart
 str(MayappleData_VisitorObservations)
 
-as.factor(MayappleData_VisitorObservations$`Unit ID`)
+as.factor(MayappleData_VisitorObservations$`UnitID`)
 str(MayappleData_VisitorObservations)
 
 
@@ -154,10 +147,10 @@ library(tidyr)
 library(dplyr)
 sum_of_observations_by_factor_2 <- MayappleData_VisitorObservations %>%
   filter(!is.na(`Count of Observations`)) %>%
-  group_by(`Unit ID`) %>%
+  group_by(`UnitID`) %>%
   summarise(sum_count = sum(`Count of Observations`, na.rm = TRUE))
 print(sum_of_observations_by_factor_2)
-MayappleData_VisitorObservations$`Unit ID` <- as.factor(MayappleData_VisitorObservations$`Unit ID`)
+MayappleData_VisitorObservations$`UnitID` <- as.factor(MayappleData_VisitorObservations$`UnitID`)
 str(merged_data_observations_with_treatment)
 
 #below is copied from above
@@ -183,6 +176,21 @@ MayappleData_VisitorObservations_with_time_treatment_5$UnitID = as.factor(Mayapp
 str(MayappleData_VisitorObservations_with_time_treatment_5)
 
 #reduration time data
+#trying to re-duration the time data
+install.packages("hms")
+library(hms)
+
+MayappleData_VisitorObservations_with_time_treatment_5$TotalObservationLength = as.numeric(MayappleData_VisitorObservations_with_time_treatment_5$TotalObservationLength)
+
+library("tidyr")
+
+
+
+MayappleData_VisitorObservations_with_time_treatment_5 = MayappleData_VisitorObservations_with_time_treatment_5 %>%
+  separate(TotalObservationLength, c("hours", "minutes", "seconds"), ":")
+str(MayappleData_VisitorObservations_with_time_treatment_5)
+
+
 MayappleData_VisitorObservations_with_time_treatment_5$TotalObservationLength = as.numeric(MayappleData_VisitorObservations_with_time_treatment_5$TotalObservationLength)
 MayappleData_VisitorObservations_with_time_treatment_5 = MayappleData_VisitorObservations_with_time_treatment_5 %>%
   separate(TotalObservationLength, c("hours", "minutes", "seconds"), ":")
@@ -264,7 +272,6 @@ plot7 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = 
   scale_fill_manual(values = c("#4CAF50", "#008000"))
 print(plot7)
 
-#plot7 works now, plot6 does NOT. plot6 was supposed to be rate of pollinator count
 #seed count data, manually entered, as cannot test because no warm treatment seeds
 controlseed <- c(46, 32)
 ambientseed <- c(49, 47, 12)
@@ -287,5 +294,4 @@ plot20 <- ggplot(seed_data, aes(x = Treatment, y = Count, fill = Treatment)) +
   scale_fill_manual(values = c("#4CAF50", "#008000", "#FF5733"))
 
 print(plot20)
-#plot20 works
 #fin: 03/17/2024
