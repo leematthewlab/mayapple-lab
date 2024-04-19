@@ -1034,7 +1034,7 @@ plot20 <- ggplot(seed_data, aes(x = Treatment, y = Count, fill = Treatment)) +
   labs(title = "Seed Count",
        x = "Treatment",
        y = "Count") +
-  scale_fill_manual(values = c("#4CAF50", "#000080", "#FF5733"))
+  scale_fill_manual(values = c("#FF5733", "#4CAF50", "#000080"))
 
 print(plot20)
 
@@ -1043,7 +1043,7 @@ plot21 <- ggplot(seed_data, aes(x = Treatment, y = Count)) +
   labs(title = "Seed Count",
        x = "Treatment",
        y = "Count") +
-  scale_fill_manual(values = c("#4CAF50", "#000080", "#FF5733"))
+  scale_fill_manual(values = c("#FF5733", "#4CAF50", "#000080"))
 
 print(plot21)
 
@@ -1307,7 +1307,45 @@ average_temp_newtemp4 <- aggregate(Temperature ~ ChamberID, data = newtemp4, FUN
 print(average_temp_newtemp4)
 newtemp4_withavtemp <- merge(newtemp4, average_temp_newtemp4, by = "ChamberID")
 View(newtemp4_withavtemp)  
-#tempy is the average for each chamber over course of study  
-  
-  
-  
+#tempy is the average for each chamber over course of study
+
+
+#04/19/2024 - finish regression, newtemp4 i believe is the most recent dataset to use
+str(newtemp4_withavtemp)
+str(newtemp4)  
+library(dplyr)
+#in newtemp4_withavtemp, the av temp is temperature.y and temperature.is is the original temps
+#i feel i should make another one without the original temps
+newtemp_avonly <- newtemp4_withavtemp %>%
+  select(-Temperature.x)
+View(newtemp_avonly)
+View(MayappleData_VisitorObservations_with_time_treatment_6)
+#merge to MayappleData_VisitorObservations_with_time_treatment_6, which is what was used to make the rate of pollinator figure
+MayappleData_VisitorObservations_with_time_treatment_chamber = MayappleData_VisitorObservations_with_time_treatment_6 %>%
+  rename('ChamberID' = 'UnitID')
+#throw away MayappleData_VisitorObservations_with_time_treatment_chamber there is no chamber only ibutton
+MayappleData_VisitorObservations_with_time_treatment_9 = MayappleData_VisitorObservations_with_time_treatment_6 %>%
+  rename('Ibutton_ID' = 'UnitID')
+str(MayappleData_VisitorObservations_with_time_treatment_chamber)
+View(MayappleData_VisitorObservations_with_time_treatment_chamber)
+newregressiontemppollinator = merge(newtemp_avonly, MayappleData_VisitorObservations_with_time_treatment_9, by = 'Ibutton_ID')
+View(newregressiontemppollinator)
+newregression2 <- newregressiontemppollinator %>%
+  select(-Time) %>%
+  select(-hours) %>%
+  select(-seconds) %>%
+  select(-minutes) %>%
+  select(-Pollinator_YorN) %>%
+  select(-Antagonist_YorN) %>%
+  select(-ObservedInsectType) %>%
+  select(-minutes_by_hour_5) %>%
+  select(-seconds_by_hour_5) %>%
+  select(-total_time_duration_hours) %>%
+  select(-StartDate_Video) %>%
+  select(-EndDate_Video) %>%
+  select(-'Count of Observations') %>%
+  select(-'MayappleData_VisitorObservations_with_time_treatment_5$'Co)    
+View(newregression2)
+#Date.y correlates to the dates of the pollinator count/sitings, where Date.x correlates to the temperature and averages
+newregression2 <- newregressiontemppollinator %>%
+  select(-seconds)
