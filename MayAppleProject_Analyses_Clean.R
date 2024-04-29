@@ -14,6 +14,9 @@
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(ggrepel)
+
+install.packages("ggrepel")
 
 #Load Datasets - give instructions here for what dataset is used in the code. 
 
@@ -105,19 +108,6 @@ average_temp_weekly <- merged_mayappledata_fixed_temp_2_filter %>%
   group_by(Treatment, week = lubridate::week(Date)) %>%
   summarise(Avg_Temperature = mean(`Temperature (C)`))
 
-#temperature graph but no line, just the data point dots
-plot2 <- ggplot(average_temp_weekly, aes(x = as.factor(week), y = Avg_Temperature, color = Treatment)) +
-  geom_line(size = 1.5) +
-  geom_point() +  # Add points for each data point
-  labs(title = "Average Ambient and Warm Temperatures Each Week",
-       x = "Week",
-       y = "Average Temperature (C)",
-       color = "Treatment") +
-  scale_color_manual(values = c("#4CAF50", "#008000")) +  # Set line colors
-  theme_minimal()
-
-print(plot2)
-
 #2/16/24 - tests gave weird results, no use
 #2/23/2024 - graphs no longer useful
 na.omit(merged_observations_to_time_by_factors_hms)
@@ -143,8 +133,6 @@ MayappleData_VisitorObservations$Antagonist_YorN_binary <- ifelse(MayappleData_V
 
 observations_by_binary_treatment <- tapply(MayappleData_VisitorObservations$`Count of Observations`, MayappleData_VisitorObservations$Treatment_binary, sum, na.rm = TRUE)
 str(MayappleData_VisitorObservations)
-library(tidyr)
-library(dplyr)
 sum_of_observations_by_factor_2 <- MayappleData_VisitorObservations %>%
   filter(!is.na(`Count of Observations`)) %>%
   group_by(`UnitID`) %>%
@@ -255,22 +243,32 @@ str(MayappleData_VisitorObservations_with_time_treatment_6)
 #rate of pollinator count in treatments
 plot6 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = Treatment, y = count_divided_by_time, fill = Treatment)) +
   geom_boxplot() +
-  geom_point(position = position_jitterdodge(), size = 2) + # Add points with jitter to spread out points horizontally
-  labs(title = "Rate of Pollinator Count in Ambient and Warm Treatments",
+  geom_point() + # Add points with jitter to spread out points horizontally
+  labs(title = "Rate of Pollinator Count in Ambient and Warm",
        x = "Treatment",
        y = "Rate of Pollinator Count") +
-  scale_fill_manual(values = c("#4CAF50", "#008000"))
+  scale_fill_manual(values = c("#4CAF50", "#000080")) +
+  theme_classic()
+
 print(plot6)
+png("plot6.png", units = "in", width = 4.5, height = 4.5, res = 400)
+plot6
+dev.off()
 
 #pollinator count in treatments, not accounting for video time
 plot7 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = Treatment, y = `MayappleData_VisitorObservations_with_time_treatment_5$\`Count of Observations\``, fill = Treatment)) +
   geom_boxplot() +
-  geom_point(position = position_jitterdodge(), size = 2) + # Add points with jitter to spread out points horizontally
+  geom_point() + # Add points with jitter to spread out points horizontally
   labs(title = "Sum of Pollinator Count in Ambient and Warm",
        x = "Treatment",
        y = "Sum of Pollinator Count") +
-  scale_fill_manual(values = c("#4CAF50", "#008000"))
+  scale_fill_manual(values = c("#4CAF50", "#000080")) +
+  theme_classic()
+
 print(plot7)
+png("plot7.png", units = "in",  width = 4.5, height = 4.5, res = 400)
+plot7
+dev.off()
 
 #seed count data, manually entered, as cannot test because no warm treatment seeds
 controlseed <- c(46, 32)
@@ -285,13 +283,114 @@ seed_data <- data.frame(Treatment = rep(c("Control", "Ambient", "Warm"),
 print(seed_data)
 
 #seed count plot
+seed_data$Treatment <- factor(seed_data$Treatment, levels = c("Control", "Ambient", "Warm"))
+
 plot20 <- ggplot(seed_data, aes(x = Treatment, y = Count, fill = Treatment)) +
   geom_boxplot() +
   geom_point(position = position_jitterdodge(), size = 2) + # Add points with jitter to spread out points horizontally
   labs(title = "Seed Count",
        x = "Treatment",
        y = "Count") +
-  scale_fill_manual(values = c("#4CAF50", "#008000", "#FF5733"))
+  scale_fill_manual(values = c("#FF5733", "#4CAF50", "#000080")) +
+  theme_classic()
 
 print(plot20)
+png("plot20.png", units = "in",  width = 4.5, height = 4.5, res = 400)
+plot20
+dev.off()
 #fin: 03/17/2024
+
+#04/01/2024
+View(merged_data_temp_with_treatment_full)
+str(merged_data_temp_with_treatment_full)
+#in this date is a character
+#time is in 'hms' num which im not sure,
+#chamber_ID is also a number
+#ibutton_ID is a character
+#only treatment is a factor, so make chamber and ibutton into factor, make date into date
+
+merged_data_temp_with_treatment_full$Ibutton_ID = as.factor(merged_data_temp_with_treatment_full$Ibutton_ID)
+merged_data_temp_with_treatment_full$Chamber_ID = as.factor(merged_data_temp_with_treatment_full$Chamber_ID)
+
+# Convert the Date column to a Date object
+merged_data_temp_with_treatment_full$Date <- as.Date(merged_data_temp_with_treatment_full$Date, format = "%m/%d/%y")
+str(merged_data_temp_with_treatment_full)
+
+merged_data_temp_with_treatment_full_1 <- merged_data_temp_with_treatment_full %>%
+  rename(Temperature = 'Temperature')
+
+# Convert the date column to a Date object
+merged_data_temp_with_treatment_full$Date <- mdy(merged_data_temp_with_treatment_full$Date)
+
+result_8 <- merged_data_temp_with_treatment_full %>%
+  group_by(Treatment, Chamber_ID, Date) %>%
+  summarize(average_temp_8 = mean(Temperature))
+
+result_8 <- result_8 %>% arrange(Date)
+
+print(result_8)
+View(result_8)
+#result_8 is successful, will use for figures now in plot 
+#figures made for extra, not used in finals but just for visulization
+
+plot9 <- ggplot(result_8, aes(x = Date, y = average_temp_8, color = factor(Treatment))) +
+  geom_line() +
+  geom_point() +
+  labs(title = " Ambient and Warm Temperatures",
+       x = "Date",
+       y = "Temperature, the average for each date",
+       color = "Chamber") +
+  theme_minimal()
+
+print(plot9)
+
+plot_all_1 <- ggplot(result_8, aes(x = Date, y = average_temp_8, color = factor(Chamber_ID), linetype = Treatment)) +
+  geom_line(size = 0.5) +
+  geom_point() +
+  labs(title = "Temperature over Time",
+       x = "Date (yyyy-mm-dd)",
+       y = "Temperature (C)",
+       color = "Chamber",
+       linetype = "Treatment") +
+  scale_color_manual(values = c("red", "blue", "green", "orange", "purple", "pink", "brown", "cyan", "gray", "magenta")) +
+  scale_x_date(date_breaks = "1 week", date_labels = "%Y-%m-%d") + # Adjust x-axis date format
+  theme_minimal()
+
+print(plot_all_1)
+str(result_8)
+
+#boxplot of overall temperature by treatment, same that melissa made for poster
+boxplot_3 <- ggplot(result_8, aes(x = Treatment, y = average_temp_8)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", color = "red", show.legend = FALSE) + # Add mean point
+  stat_summary(fun.y = max, geom = "point", color = "blue", show.legend = FALSE) + # Add max point
+  stat_summary(fun.y = min, geom = "point", color = "green", show.legend = FALSE) + # Add min point
+  stat_summary(fun.y = mean, geom = "text", aes(label = round(..y.., 2)), vjust = -0.5, color = "red", size = 3, show.legend = FALSE) + # Add mean label
+  stat_summary(fun.y = max, geom = "text", aes(label = round(..y.., 2)), vjust = -1, color = "blue", size = 3, show.legend = FALSE) + # Add max label
+  stat_summary(fun.y = min, geom = "text", aes(label = round(..y.., 2)), vjust = 1.5, color = "green", size = 3, show.legend = FALSE) + # Add min label
+  labs(title = "Boxplot of Temperature by Treatment",
+       x = "Treatment",
+       y = "Average Temperature") +
+  theme_minimal()
+print(boxplot_3)
+
+#04/08/2024
+#redoing temperature t-tests, pollination-temperature regression
+
+lastpairedtemp <- t.test(merged_data_temp_with_treatment_full$`Temperature (C)` ~ merged_data_temp_with_treatment_full$Treatment, paired = TRUE)
+print(lastpairedtemp)
+#unpaired = pvalue 0.05616
+
+View(result_8_first_month)
+pairedtempfirstmonth <- t.test(result_8_first_month$average_temp_8 ~ result_8_first_month$Treatment, paired = TRUE)
+print(pairedtempfirstmonth)
+#p value in the first month, paired = 0.3434, df = 123, t = -0.95113, with a mean difference of -0.1430238
+
+View(result_8)
+lastpaired_1 <- t.test(result_8$average_temp_8 ~ result_8$Treatment, paired = TRUE)
+print(lastpaired_1)
+#averages for each day in a t.test, unpaired, p value = 0.54, df = 537.93, t = -0.61324
+#mean in group Ambient = 13.28028 unpaired
+#mean in group Warm = 13.42158 unpaired
+
+#fin: 04/29/2024
