@@ -987,25 +987,34 @@ str(MayappleData_VisitorObservations_with_time_treatment_6)
 
 plot6 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = Treatment, y = count_divided_by_time, fill = Treatment)) +
   geom_boxplot() +
-  geom_point(position = position_jitterdodge(), size = 2) + # Add points with jitter to spread out points horizontally
-  labs(title = "Rate of Pollinator Count in Ambient and Warm Treatments",
+  geom_point() + # Add points with jitter to spread out points horizontally
+  labs(title = "Rate of Pollinator Count in Ambient and Warm",
        x = "Treatment",
        y = "Rate of Pollinator Count") +
-  scale_fill_manual(values = c("#4CAF50", "#000080"))
+  scale_fill_manual(values = c("#4CAF50", "#000080")) +
+  theme_classic()
 
 print(plot6)
+png("plot6.png", units = "in", width = 4.5, height = 4.5, res = 400)
+plot6
+dev.off()
 
 View(MayappleData_VisitorObservations_with_time_treatment_6)
 
 plot7 <- ggplot(MayappleData_VisitorObservations_with_time_treatment_6, aes(x = Treatment, y = `MayappleData_VisitorObservations_with_time_treatment_5$\`Count of Observations\``, fill = Treatment)) +
   geom_boxplot() +
-  geom_point(position = position_jitterdodge(), size = 2) + # Add points with jitter to spread out points horizontally
+  geom_point() + # Add points with jitter to spread out points horizontally
   labs(title = "Sum of Pollinator Count in Ambient and Warm",
        x = "Treatment",
        y = "Sum of Pollinator Count") +
-  scale_fill_manual(values = c("#4CAF50", "#000080"))
+  scale_fill_manual(values = c("#4CAF50", "#000080")) +
+  theme_classic()
 
 print(plot7)
+png("plot7.png", units = "in",  width = 4.5, height = 4.5, res = 400)
+plot7
+dev.off()
+
 
 #03/11/2024
 #seed counting figures
@@ -1028,15 +1037,22 @@ seed_data <- data.frame(Treatment = rep(c("Control", "Ambient", "Warm"),
                         Count = c(controlseed, ambientseed, warmseed))
 print(seed_data)
 
+seed_data$Treatment <- factor(seed_data$Treatment, levels = c("Control", "Ambient", "Warm"))
+
 plot20 <- ggplot(seed_data, aes(x = Treatment, y = Count, fill = Treatment)) +
   geom_boxplot() +
   geom_point(position = position_jitterdodge(), size = 2) + # Add points with jitter to spread out points horizontally
   labs(title = "Seed Count",
        x = "Treatment",
        y = "Count") +
-  scale_fill_manual(values = c("#FF5733", "#4CAF50", "#000080"))
+  scale_fill_manual(values = c("#FF5733", "#4CAF50", "#000080")) +
+  theme_classic()
 
 print(plot20)
+png("plot20.png", units = "in",  width = 4.5, height = 4.5, res = 400)
+plot20
+dev.off()
+
 
 plot21 <- ggplot(seed_data, aes(x = Treatment, y = Count)) +
   geom_point(position = position_jitterdodge(), size = 2) + # Add points with jitter to spread out points horizontally
@@ -1311,41 +1327,3 @@ View(newtemp4_withavtemp)
 
 
 #04/19/2024 - finish regression, newtemp4 i believe is the most recent dataset to use
-str(newtemp4_withavtemp)
-str(newtemp4)  
-library(dplyr)
-#in newtemp4_withavtemp, the av temp is temperature.y and temperature.is is the original temps
-#i feel i should make another one without the original temps
-newtemp_avonly <- newtemp4_withavtemp %>%
-  select(-Temperature.x)
-View(newtemp_avonly)
-View(MayappleData_VisitorObservations_with_time_treatment_6)
-#merge to MayappleData_VisitorObservations_with_time_treatment_6, which is what was used to make the rate of pollinator figure
-MayappleData_VisitorObservations_with_time_treatment_chamber = MayappleData_VisitorObservations_with_time_treatment_6 %>%
-  rename('ChamberID' = 'UnitID')
-#throw away MayappleData_VisitorObservations_with_time_treatment_chamber there is no chamber only ibutton
-MayappleData_VisitorObservations_with_time_treatment_9 = MayappleData_VisitorObservations_with_time_treatment_6 %>%
-  rename('Ibutton_ID' = 'UnitID')
-str(MayappleData_VisitorObservations_with_time_treatment_chamber)
-View(MayappleData_VisitorObservations_with_time_treatment_chamber)
-newregressiontemppollinator = merge(newtemp_avonly, MayappleData_VisitorObservations_with_time_treatment_9, by = 'Ibutton_ID')
-View(newregressiontemppollinator)
-newregression2 <- newregressiontemppollinator %>%
-  select(-Time) %>%
-  select(-hours) %>%
-  select(-seconds) %>%
-  select(-minutes) %>%
-  select(-Pollinator_YorN) %>%
-  select(-Antagonist_YorN) %>%
-  select(-ObservedInsectType) %>%
-  select(-minutes_by_hour_5) %>%
-  select(-seconds_by_hour_5) %>%
-  select(-total_time_duration_hours) %>%
-  select(-StartDate_Video) %>%
-  select(-EndDate_Video) %>%
-  select(-'Count of Observations') %>%
-  select(-'MayappleData_VisitorObservations_with_time_treatment_5$'Co)    
-View(newregression2)
-#Date.y correlates to the dates of the pollinator count/sitings, where Date.x correlates to the temperature and averages
-newregression2 <- newregressiontemppollinator %>%
-  select(-seconds)
